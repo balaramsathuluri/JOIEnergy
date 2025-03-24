@@ -1,0 +1,27 @@
+[
+    {
+        "name": "Sarah",
+        "smartMeterId": "smart-meter-0",
+        "powerSupplier": "Dr Evil's Dark Energy"
+    },
+    {
+        "name": "Peter",
+        "smartMeterId": "smart-meter-1",
+        "powerSupplier": "The Green Eco"
+    },
+    {
+        "name": "Charlie",
+        "smartMeterId": "smart-meter-2",
+        "powerSupplier": "Dr Evil's Dark Energy"
+    },
+    {
+        "name": "Andrea",
+        "smartMeterId": "smart-meter-3",
+        "powerSupplier": "Power for Everyone"
+    },
+    {
+        "name": "Alex",
+        "smartMeterId": "smart-meter-4",
+        "powerSupplier": "The Green Eco"
+    }
+]

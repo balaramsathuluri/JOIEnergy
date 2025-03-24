@@ -1,0 +1,67 @@
+[
+    {
+        "smartMeterId": "smart-meter-0",
+        "electricityReadings": [
+            {
+                "time": "2025-03-21T12:00:00Z",
+                "reading": 15.2
+            },
+            {
+                "time": "2025-03-22T14:30:00Z",
+                "reading": 12.8
+            }
+        ]
+    },
+    {
+        "smartMeterId": "smart-meter-1",
+        "electricityReadings": [
+            {
+                "time": "2025-03-20T10:00:00Z",
+                "reading": 18.4
+            },
+            {
+                "time": "2025-03-21T15:45:00Z",
+                "reading": 14.2
+            }
+        ]
+    },
+    {
+        "smartMeterId": "smart-meter-2",
+        "electricityReadings": [
+            {
+                "time": "2025-03-19T09:20:00Z",
+                "reading": 22.1
+            },
+            {
+                "time": "2025-03-20T17:00:00Z",
+                "reading": 16.5
+            }
+        ]
+    },
+    {
+        "smartMeterId": "smart-meter-3",
+        "electricityReadings": [
+            {
+                "time": "2025-03-18T08:30:00Z",
+                "reading": 30.3
+            },
+            {
+                "time": "2025-03-19T12:15:00Z",
+                "reading": 25.7
+            }
+        ]
+    },
+    {
+        "smartMeterId": "smart-meter-4",
+        "electricityReadings": [
+            {
+                "time": "2025-03-17T07:45:00Z",
+                "reading": 19.8
+            },
+            {
+                "time": "2025-03-18T18:10:00Z",
+                "reading": 13.6
+            }
+        ]
+    }
+]

@@ -1,0 +1,20 @@
+[
+    {
+        "planName": "price-plan-0",
+        "energySupplier": "DrEvilsDarkEnergy",
+        "unitRate": 10,
+        "peakTimeMultiplier": []
+    },
+    {
+        "planName": "price-plan-1",
+        "energySupplier": "TheGreenEco",
+        "unitRate": 2,
+        "peakTimeMultiplier": []
+    },
+    {
+        "planName": "price-plan-2",
+        "energySupplier": "PowerForEveryone",
+        "unitRate": 1,
+        "peakTimeMultiplier": []
+    }
+]
