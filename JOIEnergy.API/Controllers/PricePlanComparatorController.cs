@@ -9,77 +9,85 @@ namespace JOIEnergy.API.Controllers
     [Route("price-plans")]
     public class PricePlanComparatorController : ControllerBase
     {
+        private readonly ILogger<PricePlanComparatorController> _logger;
         private readonly IPricePlanService _pricePlanService;
         private readonly IAccountService _accountService;
 
-        public PricePlanComparatorController(IPricePlanService pricePlanService, IAccountService accountService)
+        public PricePlanComparatorController(IPricePlanService pricePlanService, IAccountService accountService, ILogger<PricePlanComparatorController> logger)
         {
             _pricePlanService = pricePlanService;
             _accountService = accountService;
+            _logger = logger;
         }
 
-        /// <summary>
-        /// Compares consumption costs for each price plan for a given smart meter.
-        /// Returns an object containing the current price plan and the cost comparisons.
-        /// </summary>
-        /// <param name="smartMeterId">Smart meter identifier.</param>
-        /// <returns>Price plan comparison details.</returns>
         [HttpGet("compare-all/{smartMeterId}")]
         public IActionResult CalculatedCostForEachPricePlan(string smartMeterId)
         {
-            if (string.IsNullOrWhiteSpace(smartMeterId))
+            _logger.LogInformation("Calculating cost for SmartMeterId: {SmartMeterId}", smartMeterId);
+            try
             {
-                return BadRequest("Smart meter ID cannot be null or empty.");
+                if (string.IsNullOrWhiteSpace(smartMeterId))
+                {
+                    _logger.LogWarning("Smart meter ID is null or empty");
+                    return BadRequest("Smart meter ID cannot be null or empty.");
+                }
+
+                string pricePlanId = _accountService.GetPricePlanIdForSmartMeterId(smartMeterId);
+                var costPerPricePlan = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
+
+                if (costPerPricePlan == null || !costPerPricePlan.Any())
+                {
+                    _logger.LogWarning("No cost data found for SmartMeterId: {SmartMeterId}", smartMeterId);
+                    return NotFound($"Smart Meter ID ({smartMeterId}) not found");
+                }
+
+                var response = new Dictionary<string, object>
+                {
+                    { "pricePlanId", pricePlanId },
+                    { "pricePlanComparisons", costPerPricePlan }
+                };
+
+                return Ok(response);
             }
-
-            string pricePlanId = _accountService.GetPricePlanIdForSmartMeterId(smartMeterId);
-            var costPerPricePlan = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
-
-            if (costPerPricePlan == null || !costPerPricePlan.Any())
+            catch (Exception ex)
             {
-                return NotFound($"Smart Meter ID ({smartMeterId}) not found");
+                _logger.LogError(ex, "Error occurred while calculating price plan costs for SmartMeterId: {SmartMeterId}", smartMeterId);
+                return StatusCode(500, "An error occurred while processing your request.");
             }
-
-            var response = new Dictionary<string, object>
-            {
-                { "pricePlanId", pricePlanId },
-                { "pricePlanComparisons", costPerPricePlan }
-            };
-
-            return Ok(response);
         }
 
-        /// <summary>
-        /// Recommends the cheapest price plans based on consumption cost.
-        /// Optionally limits the number of recommendations returned.
-        /// </summary>
-        /// <param name="smartMeterId">Smart meter identifier.</param>
-        /// <param name="limit">Optional limit for the number of recommendations.</param>
-        /// <returns>A sorted list of price plan recommendations.</returns>
         [HttpGet("recommend/{smartMeterId}")]
         public IActionResult RecommendCheapestPricePlans(string smartMeterId, int? limit = null)
         {
-            if (string.IsNullOrWhiteSpace(smartMeterId))
+            _logger.LogInformation("Recommending cheapest price plan for SmartMeterId: {SmartMeterId}", smartMeterId);
+            try
             {
-                return BadRequest("Smart meter ID cannot be null or empty.");
-            }
+                if (string.IsNullOrWhiteSpace(smartMeterId))
+                {
+                    _logger.LogWarning("Smart meter ID is null or empty");
+                    return BadRequest("Smart meter ID cannot be null or empty.");
+                }
 
-            var consumptionForPricePlans = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
-            if (consumptionForPricePlans == null || !consumptionForPricePlans.Any())
+                var consumptionForPricePlans = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
+                if (consumptionForPricePlans == null || !consumptionForPricePlans.Any())
+                {
+                    _logger.LogWarning("No consumption data found for SmartMeterId: {SmartMeterId}", smartMeterId);
+                    return NotFound($"Smart Meter ID ({smartMeterId}) not found");
+                }
+
+                var recommendations = consumptionForPricePlans.OrderBy(x => x.Value);
+                if (limit.HasValue && limit.Value > 0)
+                {
+                    return Ok(recommendations.Take(limit.Value));
+                }
+
+                return Ok(recommendations);
+            }
+            catch (Exception ex)
             {
-                return NotFound($"Smart Meter ID ({smartMeterId}) not found");
+                _logger.LogError(ex, "Error occurred while recommending price plans for SmartMeterId: {SmartMeterId}", smartMeterId);
+                return StatusCode(500, "An error occurred while processing your request.");
             }
-
-            var recommendations = consumptionForPricePlans.OrderBy(x => x.Value);
-
-            if (limit.HasValue && limit.Value > 0)
-            {
-                var limitedRecommendations = recommendations.Take(limit.Value);
-                return Ok(limitedRecommendations);
-            }
-
-            return Ok(recommendations);
         }
-
     }
 }

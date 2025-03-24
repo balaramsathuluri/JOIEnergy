@@ -6,6 +6,14 @@ using JOIEnergy.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register logging
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();  // Console logging
+    logging.AddDebug();    // Debug output logging
+});
+
 // Add Controllers & API Docs
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -17,15 +25,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
-
-// Add HTTP Logging with configuration
-builder.Services.AddHttpLogging(options =>
-{
-    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
-    options.RequestBodyLogLimit = 4096;
-    options.ResponseBodyLogLimit = 4096;
-});
-
 
 /// Register Repositories
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
@@ -50,11 +49,10 @@ if (app.Environment.IsDevelopment())
 // Apply Middleware
 app.UseRouting();
 app.UseCors("AllowAll");
-app.UseHttpLogging();
+
 app.UseAuthorization();
 
-// Group API Routes for Better Organization (New in .NET 8)
-//var apiGroup = app.MapGroup("/api");
+
 app.MapControllers();
 
 app.Run();

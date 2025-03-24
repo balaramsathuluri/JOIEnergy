@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JOIEnergy.Domain.Models;
+﻿using JOIEnergy.Domain.Models;
 using JOIEnergy.Repository.Interfaces;
 using JOIEnergy.Services.Implementations;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace JOIEnergy.Tests
 {
     public class MeterReadingServiceTest
-    {        
-
+    {
         private readonly Mock<IMeterReadingRepository> _mockMeterReadingRepository;
+        private readonly Mock<ILogger<MeterReadingService>> _loggerMock;
         private readonly MeterReadingService _meterReadingService;
 
         public MeterReadingServiceTest()
-        {           
-
+        {
             _mockMeterReadingRepository = new Mock<IMeterReadingRepository>();
+            _loggerMock = new Mock<ILogger<MeterReadingService>>();
 
             _mockMeterReadingRepository
                 .Setup(repo => repo.GetReadings("smart-meter-1"))
@@ -29,11 +25,11 @@ namespace JOIEnergy.Tests
                 new ElectricityReading { Time = DateTime.UtcNow, Reading = 60m }
                 });
 
-            _meterReadingService = new MeterReadingService(_mockMeterReadingRepository.Object);
+            _meterReadingService = new MeterReadingService(_mockMeterReadingRepository.Object, _loggerMock.Object);
         }
 
         [Fact]
-        public void GivenMeterIdThatDoesNotExistShouldReturnNull()
+        public void GivenMeterIdThatDoesNotExist_ShouldReturnEmptyList()
         {
             _mockMeterReadingRepository.Setup(repo => repo.GetReadings("unknown-meter")).Returns(new List<ElectricityReading>());
 
@@ -42,7 +38,7 @@ namespace JOIEnergy.Tests
         }
 
         [Fact]
-        public void GivenMeterReadingThatExistsShouldReturnMeterReadings()
+        public void GivenMeterReadingThatExists_ShouldReturnMeterReadings()
         {
             var readings = _meterReadingService.GetReadings("smart-meter-1");
             Assert.NotEmpty(readings);
@@ -65,6 +61,6 @@ namespace JOIEnergy.Tests
             var readings = _meterReadingService.GetReadings("empty-meter");
             Assert.Empty(readings);
         }
-
     }
+
 }

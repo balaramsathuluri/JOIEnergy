@@ -1,23 +1,24 @@
 using JOIEnergy.Repository.Interfaces;
 using JOIEnergy.Services.Implementations;
 using JOIEnergy.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace JOIEnergy.Tests
 {
-
     public class AccountServiceTest
     {
         private const string PRICE_PLAN_ID = "price-plan-id";
         private const string SMART_METER_ID = "smart-meter-id";
 
-
         private readonly Mock<ISmartMeterPricePlanRepository> _mockSmartMeterPricePlanRepository;
+        private readonly Mock<ILogger<AccountService>> _mockLogger;
         private readonly IAccountService _accountService;
 
         public AccountServiceTest()
         {
             _mockSmartMeterPricePlanRepository = new Mock<ISmartMeterPricePlanRepository>();
+            _mockLogger = new Mock<ILogger<AccountService>>();
 
             _mockSmartMeterPricePlanRepository.Setup(repo => repo.GetSmartMeterToPricePlanMappings())
                 .Returns(new Dictionary<string, string>
@@ -25,10 +26,9 @@ namespace JOIEnergy.Tests
                 { SMART_METER_ID, PRICE_PLAN_ID }
                 });
 
-            _accountService = new AccountService(_mockSmartMeterPricePlanRepository.Object);
+            _accountService = new AccountService(_mockSmartMeterPricePlanRepository.Object, _mockLogger.Object);
         }
 
-        
         [Fact]
         public void GivenValidSmartMeterId_WhenRetrievingPricePlan_ShouldReturnCorrectPlanId()
         {
@@ -56,7 +56,5 @@ namespace JOIEnergy.Tests
             var result = _accountService.GetPricePlanIdForSmartMeterId("");
             Assert.Null(result);
         }
-
     }
-
 }
