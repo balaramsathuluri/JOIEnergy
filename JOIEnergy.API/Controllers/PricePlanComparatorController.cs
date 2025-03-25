@@ -1,6 +1,5 @@
 ﻿
 using JOIEnergy.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JOIEnergy.API.Controllers
@@ -9,9 +8,15 @@ namespace JOIEnergy.API.Controllers
     [Route("price-plans")]
     public class PricePlanComparatorController : ControllerBase
     {
+        #region Private Members
+
         private readonly ILogger<PricePlanComparatorController> _logger;
         private readonly IPricePlanService _pricePlanService;
         private readonly IAccountService _accountService;
+
+        #endregion
+
+        #region Constructor
 
         public PricePlanComparatorController(IPricePlanService pricePlanService, IAccountService accountService, ILogger<PricePlanComparatorController> logger)
         {
@@ -19,6 +24,10 @@ namespace JOIEnergy.API.Controllers
             _accountService = accountService;
             _logger = logger;
         }
+
+        #endregion
+
+        #region API Methods
 
         [HttpGet("compare-all/{smartMeterId}")]
         public IActionResult CalculatedCostForEachPricePlan(string smartMeterId)
@@ -89,5 +98,7 @@ namespace JOIEnergy.API.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+
+        #endregion
     }
 }

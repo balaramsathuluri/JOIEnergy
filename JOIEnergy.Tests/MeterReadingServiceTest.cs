@@ -49,8 +49,12 @@ namespace JOIEnergy.Tests
         public void GivenNullMeterId_WhenFetchingReadings_ShouldReturnEmptyList()
         {
             var readings = _meterReadingService.GetReadings(null);
-            Assert.Null(readings);
+
+            // Ensure it returns an empty list, not null
+            Assert.NotNull(readings);
+            Assert.Empty(readings);
         }
+
 
         [Fact]
         public void GivenSmartMeterIdWithNoReadings_WhenFetchingReadings_ShouldReturnEmptyList()

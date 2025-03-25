@@ -27,7 +27,6 @@ builder.Services.AddCors(options =>
 });
 
 /// Register Repositories
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IPricePlanRepository, PricePlanRepository>();
 builder.Services.AddSingleton<IMeterReadingRepository, MeterReadingRepository>();
 builder.Services.AddSingleton<ISmartMeterPricePlanRepository, SmartMeterPricePlanRepository>();

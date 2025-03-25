@@ -9,38 +9,56 @@ namespace JOIEnergy.API.Controllers
     [Route("readings")]
     public class MeterReadingController : ControllerBase
     {
+        #region Private Members
+
         private readonly ILogger<MeterReadingController> _logger;
         private readonly IMeterReadingService _meterReadingService;
 
+        #endregion
+
+
+        #region Constructor
         public MeterReadingController(IMeterReadingService meterReadingService, ILogger<MeterReadingController> logger)
         {
             _meterReadingService = meterReadingService;
             _logger = logger;
         }
 
+        #endregion
+
+        #region API Methods
+
         [HttpPost("store")]
-        public IActionResult StoreReading([FromBody] SmartMeterReadings meterReadings)
+        public IActionResult StoreReading([FromBody] MeterReadings meterReadings)
         {
-            _logger.LogInformation("Storing readings for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId);
+            _logger.LogInformation("Received request to store readings for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId ?? "NULL");
+
             try
             {
                 if (!IsMeterReadingsValid(meterReadings))
                 {
-                    _logger.LogWarning("Invalid meter readings received.");
-                    return BadRequest("Invalid meter readings. Ensure SmartMeterId and ElectricityReadings are provided.");
+                    _logger.LogWarning("Invalid meter readings received for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId ?? "NULL");
+                    return UnprocessableEntity("Invalid meter readings. Ensure SmartMeterId and ElectricityReadings are provided.");
                 }
 
                 _meterReadingService.StoreReadings(meterReadings.SmartMeterId, meterReadings.ElectricityReadings);
                 var storedReadings = _meterReadingService.GetReadings(meterReadings.SmartMeterId);
 
+                _logger.LogInformation("Successfully stored readings for SmartMeterId: {SmartMeterId}", meterReadings.SmartMeterId);
                 return Ok(new { smartMeterId = meterReadings.SmartMeterId, electricityReadings = storedReadings });
+            }
+            catch (ArgumentNullException ex)
+            {
+                _logger.LogError(ex, "Missing required values for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId ?? "NULL");
+                return BadRequest("SmartMeterId or readings cannot be null.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error storing readings for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId);
+                _logger.LogError(ex, "Unexpected error while storing readings for SmartMeterId: {SmartMeterId}", meterReadings?.SmartMeterId ?? "NULL");
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+
 
         [HttpGet("read/{smartMeterId}")]
         public IActionResult GetReading(string smartMeterId)
@@ -51,8 +69,9 @@ namespace JOIEnergy.API.Controllers
                 var readings = _meterReadingService.GetReadings(smartMeterId);
 
                 if (readings == null || !readings.Any())
-                {
-                    _logger.LogWarning("No readings found for SmartMeterId: {SmartMeterId}", smartMeterId);
+                {                    
+                    _logger.LogWarning("No readings found for SmartMeterId: {SmartMeterId}. Check if the meter exists or if data is missing.", smartMeterId);
+
                     return NotFound($"No readings found for smart meter: {smartMeterId}");
                 }
 
@@ -65,26 +84,31 @@ namespace JOIEnergy.API.Controllers
             }
         }
 
-        private bool IsMeterReadingsValid(SmartMeterReadings meterReadings)
+        #endregion
+
+        private bool IsMeterReadingsValid(MeterReadings meterReadings)
         {
-            try
+            if (meterReadings == null)
             {
-                bool isValid = meterReadings != null &&
-                               !string.IsNullOrWhiteSpace(meterReadings.SmartMeterId) &&
-                               meterReadings.ElectricityReadings != null &&
-                               meterReadings.ElectricityReadings.Any();
-                if (!isValid)
-                {
-                    _logger.LogWarning("Meter readings validation failed.");
-                }
-                return isValid;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error validating meter readings.");
+                _logger.LogWarning("Validation failed: MeterReadings object is null.");
                 return false;
             }
+
+            if (string.IsNullOrWhiteSpace(meterReadings.SmartMeterId))
+            {
+                _logger.LogWarning("Validation failed: SmartMeterId is missing or empty.");
+                return false;
+            }
+
+            if (meterReadings.ElectricityReadings == null || !meterReadings.ElectricityReadings.Any())
+            {
+                _logger.LogWarning("Validation failed: ElectricityReadings are missing or empty.");
+                return false;
+            }
+
+            return true;
         }
+
     }
 }
 

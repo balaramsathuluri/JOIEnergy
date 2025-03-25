@@ -26,23 +26,24 @@ namespace JOIEnergy.Tests
         }
 
         [Fact]
-        public void StoreReading_ReturnsBadRequest_WhenInvalidMeterReadings()
+        public void StoreReading_ReturnsUnprocessableEntity_WhenInvalidMeterReadings()
         {
             // Arrange
-            var invalidReading = new SmartMeterReadings { SmartMeterId = "", ElectricityReadings = null };
+            var invalidReading = new MeterReadings { SmartMeterId = "", ElectricityReadings = null };
 
             // Act
             var result = _controller.StoreReading(invalidReading);
 
             // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            Assert.IsType<UnprocessableEntityObjectResult>(result);
         }
+
 
         [Fact]
         public void StoreReading_ReturnsOk_WhenValidMeterReadings()
         {
             // Arrange
-            var validReading = new SmartMeterReadings
+            var validReading = new MeterReadings
             {
                 SmartMeterId = "12345",
                 ElectricityReadings = new List<ElectricityReading> { new ElectricityReading() }

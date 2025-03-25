@@ -46,7 +46,7 @@ namespace JOIEnergy.Repository.Implementations
             else if (File.Exists(_jsonFilePath))
             {
 
-                var readingsList = JsonReader.LoadJson<List<SmartMeterReadings>>(_jsonFilePath) ?? new List<SmartMeterReadings>();
+                var readingsList = JsonReader.LoadJson<List<MeterReadings>>(_jsonFilePath) ?? new List<MeterReadings>();
                 _readings = readingsList.ToDictionary(m => m.SmartMeterId, m => m.ElectricityReadings);
             }
             else
@@ -78,7 +78,7 @@ namespace JOIEnergy.Repository.Implementations
             try
             {
                 string json = JsonSerializer.Serialize(
-                    _readings.Select(kvp => new SmartMeterReadings
+                    _readings.Select(kvp => new MeterReadings
                     {
                         SmartMeterId = kvp.Key,
                         ElectricityReadings = kvp.Value

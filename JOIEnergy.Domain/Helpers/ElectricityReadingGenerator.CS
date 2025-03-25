@@ -7,9 +7,9 @@ namespace JOIEnergy.Domain.Helpers
     {
         private static readonly Random _random = new Random();
 
-        public static List<SmartMeterReadings> GenerateReadings(int days, int readingsPerDay)
+        public static List<MeterReadings> GenerateReadings(int days, int readingsPerDay)
         {
-            List<SmartMeterReadings> smartMeterReadingsList = new();
+            List<MeterReadings> smartMeterReadingsList = new();
 
             string[] smartMeterIds = { "smart-meter-0", "smart-meter-1", "smart-meter-2", "smart-meter-3", "smart-meter-4" };
             Random _random = new Random();
@@ -31,7 +31,7 @@ namespace JOIEnergy.Domain.Helpers
                     }
                 }
 
-                smartMeterReadingsList.Add(new SmartMeterReadings
+                smartMeterReadingsList.Add(new MeterReadings
                 {
                     SmartMeterId = meterId,
                     ElectricityReadings = readings
