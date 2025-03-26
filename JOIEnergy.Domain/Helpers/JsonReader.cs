@@ -5,12 +5,12 @@ namespace JOIEnergy.Domain.Helpers
 {
     public static class JsonReader
     {
-        public static T? LoadJson<T>(string filePath) where T : class
+        public static T LoadJson<T>(string filePath) where T : class, new()
         {
             if (!File.Exists(filePath))
             {
                 Console.WriteLine($"File not found: {filePath}");
-                return null;  // Explicitly returning null for reference types
+                return new T();  // Explicitly returning null for reference types
             }
 
             try
@@ -21,7 +21,7 @@ namespace JOIEnergy.Domain.Helpers
             catch (Exception ex)
             {
                 Console.WriteLine($"Error reading JSON file {filePath}: {ex.Message}");
-                return null;  // Handle exceptions by returning null
+                return new T();  // Handle exceptions by returning null
             }
         }
     }

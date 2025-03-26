@@ -112,7 +112,7 @@ namespace JOIEnergy.Services.Implementations
                     catch (CalculationException calcEx)
                     {
                         _logger.LogError(calcEx, "Calculation error for PricePlan: {PricePlan} and SmartMeterId: {SmartMeterId}", plan.PlanName, smartMeterId);
-                        costByPlan[plan.PlanName] = -1; // Default or fallback value, can be adjusted
+                        throw new InvalidOperationException($"Failed to caluclate cost for plan {plan.PlanName}");
                     }
                 }
 
