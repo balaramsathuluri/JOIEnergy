@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JOIEnergy.Repository.Implementations.Utilities;
+﻿using JOIEnergy.Domain.Helpers;
 using JOIEnergy.Repository.Interfaces;
 
 namespace JOIEnergy.Repository.Implementations

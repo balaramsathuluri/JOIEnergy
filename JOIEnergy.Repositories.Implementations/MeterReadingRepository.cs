@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using JOIEnergy.Domain.Helpers;
 using JOIEnergy.Domain.Models;
-using JOIEnergy.Repository.Implementations.Utilities;
 using JOIEnergy.Repository.Interfaces;
 using Microsoft.Extensions.Configuration;
 
